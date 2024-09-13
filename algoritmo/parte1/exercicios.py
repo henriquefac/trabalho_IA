@@ -1,3 +1,4 @@
+
 from classe_principal.metodos.hill_climbing import Hill_climb
 from classe_principal.metodos.grs import GRS
 from classe_principal.metodos.lrs import LRS
