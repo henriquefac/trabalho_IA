@@ -1,10 +1,10 @@
 import numpy as np
 
 class LRS():
-    def __init__(self, desvio, limite: np.ndarray, function, min = False, x_array=None) -> None:
+    def __init__(self, limite: np.ndarray, function, min = False, x_array=None, sigma = None) -> None:
         self.func = function
         self.max_tier = 10000
-        self.desvio = desvio
+        self.sigma = sigma
         self.limite = limite
         if x_array is None:
             self.x_array = np.array([
@@ -20,7 +20,7 @@ class LRS():
         
     def dist(self, x, limite):
         l1, l2 = limite
-        cand = np.clip(x + np.random.normal(0, self.desvio), l1, l2)
+        cand = np.clip(x + np.random.normal(0, self.sigma), l1, l2)
         return cand
 
     def pertubar(self, x_array):
@@ -35,22 +35,23 @@ class LRS():
         f_opt = self.func(*x_opt)
         
         count = 0
-        last_val = f_opt
+        stop = 100
         for _ in range(self.max_tier):
+            ultimo_otimo = f_opt
             #criar novo candidato
             x_cand = self.pertubar(x_opt)
             f_cand = self.func(*x_cand)
             if self.decision(f_cand, f_opt):
                 x_opt = x_cand
                 f_opt = f_cand
-            #print(x_opt)
-                    # Verifica a condição de parada
-            if count == 20:
-                if np.abs(last_val - f_opt) < 0.000000001:
-                    
-                    break
+                if np.abs(f_opt - ultimo_otimo) < 10**(-12):
+                    count += 1
                 else:
                     count = 0
-                    last_val = f_opt
-            count += 1
+            else:
+                # se não houver melhoria, contador aumenta
+                count+=1
+
+            if count == stop:
+                break
         return x_opt, f_opt
