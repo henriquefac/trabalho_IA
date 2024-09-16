@@ -1,6 +1,6 @@
 import numpy as np
 
-class Alg_gen_1:
+class Alg_gen_bit:
     def __init__(self, bit, pop_size, max_generation, restricoes, crossover_rate=0.85,
                  mutation_rate=0.01, A=10, p=20, n_cross=2):
         self.A = A
@@ -106,7 +106,7 @@ class Alg_gen_1:
     def verificar_criterio(self, populacao):
         aptidoes = np.array([self.f_apt(self.convert(individual)) for individual in populacao])
         melhor_aptidao = np.min(aptidoes)
-        if melhor_aptidao < 1e-6:  # Critério de convergência (exemplo)
+        if melhor_aptidao < 100:  # Critério de convergência (exemplo)
             return True
         return False
     
@@ -117,7 +117,8 @@ class Alg_gen_1:
             aptidoes = np.array([self.f_apt(self.convert(individual)) for individual in populacao])
             
             if self.verificar_criterio(populacao):
-                print(f"Convergência alcançada na geração {geracao}")
+                if __name__ == "__main__":
+                    print(f"Convergência alcançada na geração {geracao}")
                 break
             
             populacao = self.new_generation(populacao, aptidoes)
@@ -126,11 +127,12 @@ class Alg_gen_1:
         aptidoes = np.array([self.f_apt(self.convert(individual)) for individual in populacao])
         melhor_individuo = populacao[np.argmin(aptidoes)]
         melhor_aptidao = np.min(aptidoes)
-        print(f"Melhor aptidão encontrada: {melhor_aptidao}")
-        print(f"Melhor indivíduo: {melhor_individuo}")
+        return melhor_individuo, populacao
 
 
 if __name__ == "__main__":
     # Exemplo de uso
-    alg_gen = Alg_gen_1(bit=15, pop_size=100, max_generation=1000, restricoes=(-10, 10))
-    alg_gen.executar()
+    alg_gen = Alg_gen_bit(bit=15, pop_size=100, max_generation=1000, restricoes=(-10, 10), n_cross=1)
+    melhor_individuo, populacao = alg_gen.executar()
+    print(alg_gen.f_apt(alg_gen.convert(melhor_individuo)))
+    print(melhor_individuo)

@@ -1,6 +1,6 @@
 import numpy as np
 
-class Alg_gen_SBX():
+class Alg_gen_dec():
     def __init__(self, eta, pop_size, max_generation, restricoes, crossover_rate=0.85,
                  mutation_rate=0.01, A=10, p=20, sigma=0.1, tournament_size=3):
         self.A = A
@@ -37,20 +37,26 @@ class Alg_gen_SBX():
         c1 = np.clip(0.5 * ((pai1 + pai2) - beta * (pai2 - pai1)), self.restricoes[0], self.restricoes[1])
         c2 = np.clip(0.5 * ((pai1 + pai2) + beta * (pai2 - pai1)), self.restricoes[0], self.restricoes[1])
         return c1, c2
-    
     def mutacao_gaussiana(self, individuo):
-        if np.random.rand() < self.mutation_rate:
-            perturbacoes = np.random.normal(0, self.sigma, size=individuo.shape)
-            individuo += perturbacoes
-            individuo = np.clip(individuo, self.restricoes[0], self.restricoes[1])
+        perturbacoes = np.random.normal(0, self.sigma, size=individuo.shape)
+        for i in range(len(individuo)): 
+            if np.random.rand() < self.mutation_rate: 
+                individuo[i] += perturbacoes[i]  
+                individuo[i] = np.clip(individuo[i], self.restricoes[0], self.restricoes[1])  
         return individuo
-    
+
     # Seleção por torneio
     def selecao_torneio(self, populacao, aptidao):
         indices = np.random.choice(len(populacao), self.tournament_size, replace=False)
         melhor_indice = indices[np.argmin(np.array(aptidao)[indices])]
         return populacao[melhor_indice]
     
+    # convergência
+    def convergencia(self, aptidao):
+        for apt in aptidao:
+            if apt < 100:
+                return True
+        return False
     # Criar nova geração
     def new_generation(self, populacao, aptidao):
         new_pop = []
@@ -73,25 +79,34 @@ class Alg_gen_SBX():
     
     # Executar o algoritmo genético
     def executar(self):
+
         populacao = self.gerar_populacao()
         for geracao in range(self.max_generation):
             aptidao = [self.f_apt(ind) for ind in populacao]
-            populacao = self.new_generation(populacao, aptidao)
-            print(f"Geração {geracao + 1}: Melhor aptidão = {min(aptidao)}")
 
+            # verificar parada por convergência
+            if self.convergencia(aptidao):
+                if __name__ == "__main__":
+                    print("parada por convergencia")
+                break
+
+            populacao = self.new_generation(populacao, aptidao)
+
+            
         # Retornar o melhor indivíduo encontrado
         aptidao = [self.f_apt(ind) for ind in populacao]
         melhor_indice = np.argmin(aptidao)
-        return populacao[melhor_indice]
+        return populacao[melhor_indice], populacao
 
 
 # Exemplo de uso
 if __name__ == "__main__":
-    eta = 20
-    pop_size = 50
-    max_generation = 100
+    eta = 1
+    pop_size = 100
+    max_generation = 1000
     restricoes = (-10, 10)  # Limites para a função objetivo
-    alg_gen = Alg_gen_SBX(eta, pop_size, max_generation, restricoes)
+    alg_gen = Alg_gen_dec(eta, pop_size, max_generation, restricoes)
 
-    melhor_individuo = alg_gen.executar()
+    melhor_individuo, best_pop = alg_gen.executar()
     print(f"Melhor indivíduo encontrado: {melhor_individuo}")
+    print(f"Apitidão do melhor indivíduo: {alg_gen.f_apt(melhor_individuo)}")
