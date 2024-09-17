@@ -79,11 +79,11 @@ class Alg_gen_dec():
     
     # Executar o algoritmo genético
     def executar(self):
-
+        mean_per_pop = list()
         populacao = self.gerar_populacao()
         for geracao in range(self.max_generation):
             aptidao = [self.f_apt(ind) for ind in populacao]
-
+            mean_per_pop.append(np.mean(aptidao))
             # verificar parada por convergência
             if self.convergencia(aptidao):
                 if __name__ == "__main__":
@@ -96,7 +96,7 @@ class Alg_gen_dec():
         # Retornar o melhor indivíduo encontrado
         aptidao = [self.f_apt(ind) for ind in populacao]
         melhor_indice = np.argmin(aptidao)
-        return populacao[melhor_indice], populacao
+        return populacao[melhor_indice], populacao, mean_per_pop
 
 
 # Exemplo de uso

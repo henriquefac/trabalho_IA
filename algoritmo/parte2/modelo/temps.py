@@ -2,7 +2,7 @@ import numpy as np
 
 class Temperatura_Simulada():
     def __init__(self, quantidade_variaveis, funcao_opt, funcao_amostra, 
-                 pertubar, temperatura=100, decay=0, iteracao = 10000, min = False) -> None:
+                 pertubar, temperatura=100, escalonamento=0, iteracao = 10000, min = False) -> None:
         # definir parâmetros de têmpera
 
         # Quantidade de variáveis
@@ -33,21 +33,21 @@ class Temperatura_Simulada():
         self.funcao_opt = funcao_opt
 
         # Função de escalonamento (decay) para reduzir a temperatura
-        if decay ==0:
-            self.decay = self.default_decay
-        elif decay == 1:
-            self.decay = self.deacay_1
+        if escalonamento ==0:
+            self.decay = self.escalonamento_default
+        elif escalonamento == 1:
+            self.decay = self.escalonamento_1
         else:
-            self.decay = self.decay_2
+            self.decay = self.escalonamento_2
 
-    def default_decay(self, t, i):
+    def escalonamento_default(self, t, i):
 
         return t * 0.99
     
-    def deacay_1(self, t, i):
+    def escalonamento_1(self, t, i):
         return t/(1+0.99*np.sqrt(t))
     
-    def decay_2(self, t, i):
+    def escalonamento_2(self, t, i):
         delta = (t - self.temperatura)/(i+1)
         return t - delta
 

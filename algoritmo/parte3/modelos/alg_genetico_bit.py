@@ -111,11 +111,15 @@ class Alg_gen_bit:
         return False
     
     def executar(self):
+        mean_per_pop = list()
         populacao = self.gerar_populacao()
         
+
         for geracao in range(self.max_generation):
             aptidoes = np.array([self.f_apt(self.convert(individual)) for individual in populacao])
-            
+
+            mean_per_pop.append(np.mean(aptidoes))
+
             if self.verificar_criterio(populacao):
                 if __name__ == "__main__":
                     print(f"Convergência alcançada na geração {geracao}")
@@ -127,7 +131,7 @@ class Alg_gen_bit:
         aptidoes = np.array([self.f_apt(self.convert(individual)) for individual in populacao])
         melhor_individuo = populacao[np.argmin(aptidoes)]
         melhor_aptidao = np.min(aptidoes)
-        return melhor_individuo, populacao
+        return melhor_individuo, populacao, mean_per_pop
 
 
 if __name__ == "__main__":
